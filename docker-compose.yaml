@@ -9,7 +9,7 @@ services:
     networks:
       af:
   eureka:
-    image: uf13/eureka:8-alpine
+    image: uf13/eureka:11-alpine
     build:
       context: ./eureka-server
     ports: 
@@ -17,7 +17,7 @@ services:
     networks:
       af:
   mongo: 
-    image: mongo:4
+    image: mongo:latest
     ports: 
       - 27017:27017
     volumes:
