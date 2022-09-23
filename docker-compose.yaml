@@ -1,0 +1,44 @@
+version: "3.9"
+services:
+  config-server:
+    image: uf13/config-server:8-alpine
+    build:
+      context: ./confserver
+    ports:
+      - 9999:9999
+    networks:
+      af:
+  eureka:
+    image: uf13/eureka:8-alpine
+    build:
+      context: ./eureka-server
+    ports: 
+      - 8761:8761
+    networks:
+      af:
+  mongo: 
+    image: mongo:4
+    ports: 
+      - 27017:27017
+    volumes:
+      - "mongodbdata:/data/db"
+    networks:
+      af:
+  catalogue:
+    image: uf13/catalogue:11-alpine
+    build:
+      context: ./catalogue
+    depends_on:
+      - config-server
+    restart: on-failure
+    environment:
+      - MONGO_HOST=mongo
+    ports:
+      - 7777:7777
+    networks:
+      af:
+networks:
+  af: 
+
+volumes:
+  mongodbdata:

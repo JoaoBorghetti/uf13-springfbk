@@ -1,0 +1,22 @@
+spring:
+ application:
+  name: gateway
+ cloud:
+  gateway:
+   routes:
+   - id: catalogueModule
+     uri: lb://CATALOGUE
+     predicates:
+     - Path=/catalogue/**
+     filters:
+     - StripPrefix=1
+   - id: purchaseModule
+     uri: lb://PURCHASE
+     predicates:
+     - Path=/purchase/**
+     filters:
+     - StripPrefix=1
+eureka:
+ client:
+  serviceUrl:
+   defaultZone: http://eureka:8761/eureka/

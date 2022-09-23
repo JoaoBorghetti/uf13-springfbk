@@ -1,0 +1,26 @@
+{
+	"folders": [
+		{
+			"path": "confserver"
+		},
+		{
+			"path": "echoservice"
+		},
+		{
+			"path": "catalogue"
+		},
+		{
+			"path": "eureka-server"
+		},
+		{
+			"path": "purchase"
+		},
+		{
+			"path": "gateway"
+		}
+	],
+	"settings": {
+		"maven.view": "flat",
+		"java.configuration.updateBuildConfiguration": "interactive"
+	}
+}
