@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   config-server:
-    image: uf13/config-server:8-alpine
+    image: uf13/config-server:11-alpine
     build:
       context: ./confserver
     ports:
@@ -30,11 +30,22 @@ services:
       context: ./catalogue
     depends_on:
       - config-server
+      - mongo
     restart: on-failure
-    environment:
-      - MONGO_HOST=mongo
     ports:
       - 7777:7777
+    networks:
+      af:
+  purchase:
+    image: uf13/purchase:11-alpine
+    build:
+     context: ./purchase
+    depends_on:
+      - config-server
+      - mongo
+    restart: on-failure
+    ports:
+      - "7788:7788"
     networks:
       af:
 networks:
