@@ -48,6 +48,15 @@ services:
       - "7788:7788"
     networks:
       af:
+  gateway:
+    image: uf13/gateway:11-alpine
+    build:
+      context: ./gateway
+    restart: on-failure
+    ports:
+      - "8080:8080"
+    networks:
+      af:
 networks:
   af: 
 
