@@ -21,3 +21,4 @@ EXPOSE 9999
 USER config
 
 ENTRYPOINT [ "java", "-jar", "/tmp/config-server-0.0.1-SNAPSHOT.jar" ]
+HEALTHCHECK --interval=25s --timeout=2s --retries=3 CMD wget --spider http://localhost:9999/actuator/health || exit 1

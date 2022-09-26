@@ -21,3 +21,4 @@ EXPOSE 7777
 USER catalogue
 
 ENTRYPOINT [ "java", "-jar", "/tmp/catalogue-0.0.1-SNAPSHOT.jar" ]
+HEALTHCHECK --interval=20s --timeout=2s --retries=3 CMD wget --spider http://localhost:7777/actuator/health || exit 1

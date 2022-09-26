@@ -21,3 +21,4 @@ EXPOSE 7788
 USER purchase
 
 ENTRYPOINT [ "java", "-jar", "/tmp/purchase-0.0.1-SNAPSHOT.jar" ]
+HEALTHCHECK --interval=20s --timeout=2s --retries=3 CMD wget --spider http://localhost:7788/actuator/health || exit 1

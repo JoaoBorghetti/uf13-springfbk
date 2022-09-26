@@ -17,11 +17,18 @@ services:
     networks:
       af:
   mongo: 
-    image: mongo:latest
+    image: mongo:4.4-rc
     # ports: 
     #  - 27017:27017
+    healthcheck:
+      test: ["CMD", "echo 'db.stats().ok' | mongo 127.0.0.1:27017/test --quiet"]
+      interval: 1m
+      timeout: 2s
+      retries: 3
+      start_period: 15s
     volumes:
       - "mongodbdata:/data/db"
+      - "mongodbconfig:/data/configdb"
     networks:
       af:
   catalogue:
@@ -29,8 +36,12 @@ services:
     build:
       context: ./catalogue
     depends_on:
-      - config-server
-      - mongo
+      config-server:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      eureka:
+        condition: service_healthy
     restart: on-failure
     #ports:
     #  - 7777:7777
@@ -41,8 +52,12 @@ services:
     build:
      context: ./purchase
     depends_on:
-      - config-server
-      - mongo
+      config-server:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      eureka:
+        condition: service_healthy
     restart: on-failure
     #ports:
     #  - "7788:7788"
@@ -52,6 +67,9 @@ services:
     image: uf13/gateway:11-alpine
     build:
       context: ./gateway
+    depends_on:
+      eureka:
+        condition: service_healthy
     restart: on-failure
     ports:
       - "8080:8080"
@@ -62,3 +80,4 @@ networks:
 
 volumes:
   mongodbdata:
+  mongodbconfig:

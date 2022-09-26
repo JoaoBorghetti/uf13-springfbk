@@ -21,3 +21,4 @@ EXPOSE 8080
 USER gateway
 
 ENTRYPOINT [ "java", "-jar", "/tmp/gateway-0.0.1-SNAPSHOT.jar" ]
+HEALTHCHECK --interval=20s --timeout=2s --retries=3 CMD wget --spider http://localhost:8080/actuator/health || exit 1
