@@ -1,2 +1,4 @@
 .vscode/*
 Workspace.code-workspace
+user-service/
+user-service/*
