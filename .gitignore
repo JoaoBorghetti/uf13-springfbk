@@ -2,3 +2,5 @@
 Workspace.code-workspace
 user-service/
 user-service/*
+.idea/
+*.iml
