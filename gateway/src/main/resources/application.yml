@@ -16,7 +16,13 @@ spring:
      - Path=/purchase/**
      filters:
      - StripPrefix=1
+   - id: authModule
+     uri: lb://USER-SERVICE
+     predicates:
+     - Path=/user-service/**
+     filters:
+     - StripPrefix=1
 eureka:
  client:
   serviceUrl:
-   defaultZone: http://eureka:8761/eureka/
+   defaultZone: http://localhost:8761/eureka/

@@ -6,6 +6,9 @@ services:
       context: ./confserver
     #ports:
     #  - 9999:9999
+    restart: on-failure
+    volumes:
+      - "./VolumeData/ConfigServer/Configurations:/Configurations"
     networks:
       af:
   eureka:
@@ -14,34 +17,36 @@ services:
       context: ./eureka-server
     #ports: 
     #  - 8761:8761
+    restart: on-failure
     networks:
       af:
   mongo: 
     image: mongo:4.4-rc
-    # ports: 
-    #  - 27017:27017
+    ports: 
+      - 27017:27017
     healthcheck:
-      test: ["CMD", "echo 'db.stats().ok' | mongo 127.0.0.1:27017/test --quiet"]
+      test: ["CMD-SHELL","echo 'db.stats().ok ? 0 : 2' | mongo 127.0.0.1:27017/test --quiet || exit 1"]
       interval: 1m
-      timeout: 2s
+      timeout: 5s
       retries: 3
-      start_period: 15s
+      start_period: 30s
     volumes:
-      - "mongodbdata:/data/db"
-      - "mongodbconfig:/data/configdb"
+      - "./VolumeData/Mongo/data:/data/db"
+      - "./VolumeData/Mongo/config:/data/configdb"
+    restart: on-failure
     networks:
       af:
   catalogue:
     image: uf13/catalogue:11-alpine
     build:
       context: ./catalogue
-    depends_on:
-      config-server:
-        condition: service_healthy
-      mongo:
-        condition: service_started
-      eureka:
-        condition: service_healthy
+    # depends_on:
+      # config-server:
+      #   condition: service_healthy
+      # mongo:
+      #   condition: service_started
+      # eureka:
+      #   condition: service_started
     restart: on-failure
     #ports:
     #  - 7777:7777
@@ -51,13 +56,13 @@ services:
     image: uf13/purchase:11-alpine
     build:
      context: ./purchase
-    depends_on:
-      config-server:
-        condition: service_healthy
-      mongo:
-        condition: service_started
-      eureka:
-        condition: service_healthy
+    # depends_on:
+      # config-server:
+      #   condition: service_healthy
+      # mongo:
+      #   condition: service_started
+      # eureka:
+      #   condition: service_started
     restart: on-failure
     #ports:
     #  - "7788:7788"
@@ -66,18 +71,28 @@ services:
   gateway:
     image: uf13/gateway:11-alpine
     build:
-      context: ./gateway
-    depends_on:
-      eureka:
-        condition: service_healthy
+       context: ./gateway
+    # depends_on:
+    #   eureka:
+    #     condition: service_started
     restart: on-failure
     ports:
       - "8080:8080"
     networks:
       af:
+  user-service:
+    image: uf13/user-service:11-alpine
+    build:
+      context: ./user-service
+    # depends_on:
+    #   config-server:
+    #     condition: service_healthy
+      # mongo:
+      #   condition: service_started
+    restart: on-failure
+    ports:
+      - "7888:7888"
+    networks:
+      af:
 networks:
   af: 
-
-volumes:
-  mongodbdata:
-  mongodbconfig:

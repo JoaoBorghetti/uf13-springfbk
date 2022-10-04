@@ -13,12 +13,12 @@ RUN mvn clean package -DskipTests
 #ENTRYPOINT [ "/bin/bash" ]
 FROM amazoncorretto:11-alpine AS run
 
-RUN addgroup -g 4000 config
-RUN adduser -u 4000 -G config -h /home/config -D config
+RUN addgroup --system config
+RUN adduser -G config -h /home/config -D config
 
 COPY --from=build --chown=config:config /tmp/target/config-server-0.0.1-SNAPSHOT.jar /tmp/config-server-0.0.1-SNAPSHOT.jar
 EXPOSE 9999
 USER config
 
 ENTRYPOINT [ "java", "-jar", "/tmp/config-server-0.0.1-SNAPSHOT.jar" ]
-HEALTHCHECK --interval=25s --timeout=2s --retries=3 CMD wget --spider http://localhost:9999/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=30s CMD wget --spider http://localhost:9999/actuator/health || exit 1

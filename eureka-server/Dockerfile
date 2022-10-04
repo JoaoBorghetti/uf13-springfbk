@@ -21,4 +21,4 @@ EXPOSE 8761
 USER eureka
 
 ENTRYPOINT [ "java", "-jar", "/tmp/eureka-server-0.0.1-SNAPSHOT.jar" ]
-HEALTHCHECK --interval=20s --timeout=2s --retries=3 CMD wget --spider http://localhost:8761/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=60s CMD wget --spider http://localhost:8761/actuator/health || exit 1

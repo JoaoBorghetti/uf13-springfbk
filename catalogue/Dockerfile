@@ -13,12 +13,12 @@ RUN mvn clean package -DskipTests
 
 FROM amazoncorretto:11-alpine AS run
 
-RUN addgroup -g 3000 catalogue
-RUN adduser -u 3000 -G catalogue -h /home/catalogue -D catalogue
+RUN addgroup --system catalogue
+RUN adduser -G catalogue -h /home/catalogue -D catalogue
 
 COPY --from=build --chown=catalogue:catalogue /tmp/target/catalogue-0.0.1-SNAPSHOT.jar /tmp/catalogue-0.0.1-SNAPSHOT.jar
 EXPOSE 7777
 USER catalogue
 
 ENTRYPOINT [ "java", "-jar", "/tmp/catalogue-0.0.1-SNAPSHOT.jar" ]
-HEALTHCHECK --interval=20s --timeout=2s --retries=3 CMD wget --spider http://localhost:7777/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 --start-period=60s CMD wget --spider http://localhost:7777/actuator/health || exit 1

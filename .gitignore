@@ -2,3 +2,5 @@
 Workspace.code-workspace
 .idea/
 *.iml
+VolumeData/Mongo/config/*
+VolumeData/Mongo/data/*
