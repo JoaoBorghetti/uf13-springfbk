@@ -4,3 +4,6 @@ Workspace.code-workspace
 *.iml
 VolumeData/Mongo/config/*
 VolumeData/Mongo/data/*
+/.metadata/
+org.eclipse.*
+org.springframework.*
