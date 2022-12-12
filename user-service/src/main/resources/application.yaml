@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: user-service
+  config:
+    import: configserver:http://${CONFIG_HOST:localhost}:${CONFIG_PORT:9999}/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/

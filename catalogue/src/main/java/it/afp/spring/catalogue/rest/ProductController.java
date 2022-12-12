@@ -23,9 +23,7 @@ public class ProductController {
     }
 
     @GetMapping("/api/products/category/{category}")
-    public List<Product> getProductsByCategory(@PathVariable String category) {
-        return service.findByCategory(category);
-    }
+    public List<Product> getProductsByCategory(@PathVariable String category) { return service.findByCategory(category); }
 
     @PostMapping("/api/products")
     public Product createProduct(@RequestBody Product product) {

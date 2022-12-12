@@ -1,0 +1,17 @@
+server:
+  port: ${CONFIG_PORT:9999}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: file:///configs

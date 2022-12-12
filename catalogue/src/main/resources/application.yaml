@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: catalogue
+  config:
+    import: configserver:http://${CONFIG_HOST:localhost}:${CONFIG_PORT:9999}/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${EUREKA_HOST}:${EUREKA_PORT}/eureka/

@@ -1,0 +1,192 @@
+version: "3.9"
+name: "user-management"
+networks:
+  af-net:
+volumes:
+  mongodbdata:
+  mongodbconfig:
+services:
+  mongo:
+    image: mongo:5.0-rc
+    healthcheck:
+      test: ["CMD", "echo 'db.stats().ok' | mongo 127.0.0.1:27017/test --quiet"]
+      interval: 1m
+      timeout: 2s
+      retries: 3
+      start_period: 15s
+    restart: on-failure
+    volumes:
+      - "./data:/data/db"
+      - "mongodbconfig:/data/configdb"
+    ports:
+      - "27017:27017"
+    networks:
+      af-net:
+  config-server:
+    image: uf13-fbk/config-server:11-alpine
+    build:
+      context: ./config-server
+      dockerfile: ../Dockerfile
+      args:
+        TARGET_VERSION: 11
+        ARTIFACT_ID: config-server
+        VERSION: 0.0.1-SNAPSHOT
+    healthcheck:
+      test: ["CMD","wget --spider http://localhost:9999/actuator/health || exit 1"]
+      interval: 25s
+      timeout: 5s
+      retries: 3
+    restart: on-failure
+    volumes:
+      - "./configs:/configs"
+    environment:
+      CONFIG_PORT: 9999
+      CONFIG_PROFILE: native
+      CONFIG_ROOT: /configs
+    networks:
+      af-net:
+  eureka:
+    image: uf13-fbk/eureka-server:11-alpine
+    build:
+      context: ./eureka-server
+      dockerfile: ../Dockerfile
+      args:
+        TARGET_VERSION: 11
+        ARTIFACT_ID: eureka-server
+        VERSION: 0.0.1-SNAPSHOT
+    healthcheck:
+      test: [ "CMD","wget --spider http://localhost:8761/actuator/health || exit 1" ]
+      interval: 25s
+      timeout: 2s
+      retries: 3
+    restart: on-failure
+    environment:
+      EUREKA_PORT: 8761
+    ports:
+      - "8761:8761"
+    networks:
+      af-net:
+  catalogue:
+    image: uf13-fbk/catalogue:11-alpine
+    build:
+      context: ./catalogue
+      dockerfile: ../Dockerfile
+      args:
+        TARGET_VERSION: 11
+        ARTIFACT_ID: catalogue
+        VERSION: 0.0.1-SNAPSHOT
+    healthcheck:
+      test: [ "CMD","wget --spider http://localhost:7777/actuator/health || exit 1" ]
+      interval: 25s
+      timeout: 2s
+      retries: 3
+    restart: on-failure
+    environment:
+      MONGO_DB: test
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      EUREKA_HOST: eureka
+      EUREKA_PORT: 8761
+      CONFIG_HOST: config-server
+      CONFIG_PORT: 9999
+    depends_on:
+      config-server:
+        condition: service_started
+      mongo:
+        condition: service_started
+      eureka:
+        condition: service_started
+    networks:
+      af-net:
+  purchase:
+    image: uf13-fbk/purchase:11-alpine
+    build:
+      context: ./purchase
+      dockerfile: ../Dockerfile
+      args:
+        TARGET_VERSION: 11
+        ARTIFACT_ID: purchase
+        VERSION: 0.0.1-SNAPSHOT
+    healthcheck:
+      test: [ "CMD","wget --spider http://localhost:7788/actuator/health || exit 1" ]
+      interval: 25s
+      timeout: 2s
+      retries: 3
+    restart: on-failure
+    environment:
+      MONGO_DB: test
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      EUREKA_HOST: eureka
+      EUREKA_PORT: 8761
+      CONFIG_HOST: config-server
+      CONFIG_PORT: 9999
+    depends_on:
+      config-server:
+        condition: service_started
+      mongo:
+        condition: service_started
+      eureka:
+        condition: service_started
+    networks:
+      af-net:
+  gateway:
+    image: uf13-fbk/gateway:11-alpine
+    build:
+      context: ./gateway
+      dockerfile: ../Dockerfile
+      args:
+        TARGET_VERSION: 11
+        ARTIFACT_ID: gateway
+        VERSION: 0.0.1-SNAPSHOT
+    healthcheck:
+      test: [ "CMD","wget --spider http://localhost:8080/actuator/health || exit 1" ]
+      interval: 25s
+      timeout: 2s
+      retries: 3
+    restart: on-failure
+    environment:
+      MONGO_DB: test
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      EUREKA_HOST: eureka
+      EUREKA_PORT: 8761
+      CONFIG_HOST: config-server
+      CONFIG_PORT: 9999
+    depends_on:
+      config-server:
+        condition: service_started
+      eureka:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      af-net:
+  user-service:
+    image: uf13-fbk/user-service:11-alpine
+    build:
+      context: ./user-service
+      dockerfile: ../Dockerfile
+      args:
+        TARGET_VERSION: 11
+        ARTIFACT_ID: user-service
+        VERSION: 0.0.1-SNAPSHOT
+    restart: on-failure
+    healthcheck:
+      test: [ "CMD","wget --spider http://localhost:7888/actuator/health || exit 1" ]
+      interval: 25s
+      timeout: 2s
+      retries: 3
+    environment:
+      MONGO_DB: test
+      MONGO_HOST: mongo
+      MONGO_PORT: 27017
+      EUREKA_HOST: eureka
+      EUREKA_PORT: 8761
+      CONFIG_HOST: config-server
+      CONFIG_PORT: 9999
+    depends_on:
+      eureka:
+        condition: service_started
+    networks:
+      af-net:
