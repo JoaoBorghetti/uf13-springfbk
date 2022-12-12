@@ -1,5 +1,5 @@
 version: "3.9"
-name: "user-management"
+name: "uf13-fbk"
 networks:
   af-net:
 volumes:
@@ -7,7 +7,7 @@ volumes:
   mongodbconfig:
 services:
   mongo:
-    image: mongo:5.0-rc
+    image: mongo:5.0
     healthcheck:
       test: ["CMD", "echo 'db.stats().ok' | mongo 127.0.0.1:27017/test --quiet"]
       interval: 1m
@@ -16,14 +16,14 @@ services:
       start_period: 15s
     restart: on-failure
     volumes:
-      - "./data:/data/db"
-      - "mongodbconfig:/data/configdb"
+      - "./data/mongo/data:/data/db"
+      - "./data/mongo/config:/data/configdb"
     ports:
       - "27017:27017"
     networks:
       af-net:
   config-server:
-    image: uf13-fbk/config-server:11-alpine
+    image: uf13/config-server:11-alpine
     build:
       context: ./config-server
       dockerfile: ../Dockerfile
@@ -38,7 +38,7 @@ services:
       retries: 3
     restart: on-failure
     volumes:
-      - "./configs:/configs"
+      - "./data/config-server/configurations:/configs"
     environment:
       CONFIG_PORT: 9999
       CONFIG_PROFILE: native
@@ -46,7 +46,7 @@ services:
     networks:
       af-net:
   eureka:
-    image: uf13-fbk/eureka-server:11-alpine
+    image: uf13/eureka-server:11-alpine
     build:
       context: ./eureka-server
       dockerfile: ../Dockerfile
@@ -67,7 +67,7 @@ services:
     networks:
       af-net:
   catalogue:
-    image: uf13-fbk/catalogue:11-alpine
+    image: uf13/catalogue:11-alpine
     build:
       context: ./catalogue
       dockerfile: ../Dockerfile
@@ -82,7 +82,7 @@ services:
       retries: 3
     restart: on-failure
     environment:
-      MONGO_DB: test
+      MONGO_DB: uf13
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       EUREKA_HOST: eureka
@@ -99,7 +99,7 @@ services:
     networks:
       af-net:
   purchase:
-    image: uf13-fbk/purchase:11-alpine
+    image: uf13/purchase:11-alpine
     build:
       context: ./purchase
       dockerfile: ../Dockerfile
@@ -114,7 +114,7 @@ services:
       retries: 3
     restart: on-failure
     environment:
-      MONGO_DB: test
+      MONGO_DB: uf13
       MONGO_HOST: mongo
       MONGO_PORT: 27017
       EUREKA_HOST: eureka
@@ -131,7 +131,7 @@ services:
     networks:
       af-net:
   gateway:
-    image: uf13-fbk/gateway:11-alpine
+    image: uf13/gateway:11-alpine
     build:
       context: ./gateway
       dockerfile: ../Dockerfile
@@ -146,9 +146,6 @@ services:
       retries: 3
     restart: on-failure
     environment:
-      MONGO_DB: test
-      MONGO_HOST: mongo
-      MONGO_PORT: 27017
       EUREKA_HOST: eureka
       EUREKA_PORT: 8761
       CONFIG_HOST: config-server
@@ -163,7 +160,7 @@ services:
     networks:
       af-net:
   user-service:
-    image: uf13-fbk/user-service:11-alpine
+    image: uf13/user-service:11-alpine
     build:
       context: ./user-service
       dockerfile: ../Dockerfile
