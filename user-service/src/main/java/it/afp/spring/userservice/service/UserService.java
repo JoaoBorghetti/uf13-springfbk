@@ -21,6 +21,13 @@ public class UserService {
     public UserDetails getByEmail(String email){
         return repo.findByEmail(email).orElse(null);
     }
+
+    /**
+     * Checks if email and password match with a user, then returns a Json Web Token from the user details.
+     * @param email email of the user
+     * @param password password of the user
+     * @return JWT which encodes the user email and id
+     */
     public String AuthenticateUser(String email, String password){
         UserDetails details = repo.findByEmail(email).orElse(null);
         if(details != null && password.equals(details.password)){

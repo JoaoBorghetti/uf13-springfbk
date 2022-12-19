@@ -32,6 +32,13 @@ public class OrderService {
         return orderRepo.findById(id).orElse(null);
     }
 
+    /**
+     * Create an order if user's id is valid, product is valid and quantity is valid
+     * @param productId
+     * @param userId
+     * @param quantity
+     * @return Order if successful, otherwise null.
+     */
     public Order createOrder(String productId, String userId, Integer quantity) {
         UserDetails user = userRepo.findById(userId).orElse(null);
         if(user == null){

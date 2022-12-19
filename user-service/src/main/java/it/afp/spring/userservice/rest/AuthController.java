@@ -5,6 +5,7 @@ import it.afp.spring.userservice.domain.UserDetails;
 import it.afp.spring.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,11 +24,9 @@ public class AuthController {
     public String Login(@RequestBody LoginDetails details){
         return service.AuthenticateUser(details.email, details.password);
     }
-
     @PostMapping("/auth/verify")
     public UserDetails Verify(@RequestHeader(HttpHeaders.AUTHORIZATION) String jwtToken){
         System.out.println("token: "+jwtToken);
         return service.getUserFromToken(jwtToken);
     }
-
 }

@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id;
 @Getter
 @Setter
 public class LoginDetails {
-    @Id public String id;
     public String email;
     public String password;
 }

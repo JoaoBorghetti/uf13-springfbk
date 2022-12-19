@@ -12,7 +12,7 @@ public class ProductService {
     private ProductRepository repository;
 
     public List<Product> getProducts() {
-        return repository.findAll();
+        return  repository.findAll();
     }
 
     public Product getProduct(String id) {
